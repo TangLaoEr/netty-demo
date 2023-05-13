@@ -1,4 +1,4 @@
-package cn.tanglaoer;
+package cn.tanglaoer.back;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
@@ -53,12 +53,12 @@ public class TimeClient {
 class TimeClientHandler extends ChannelInboundHandlerAdapter {
     Logger logger = Logger.getLogger(TimeClientHandler.class.getName());
 
-    private ByteBuf firstMessage;
+    private int counter;
+
+    private byte[] req;
 
     public TimeClientHandler() {
-        byte[] bytes = "hello world".getBytes();
-        firstMessage = Unpooled.buffer(bytes.length);
-        firstMessage.writeBytes(bytes);
+        req = ("QUERY TIME ORDER" + System.getProperty("line.separator")).getBytes();
     }
 
     /**
@@ -68,7 +68,13 @@ class TimeClientHandler extends ChannelInboundHandlerAdapter {
      */
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
-        ctx.writeAndFlush(firstMessage);
+        ByteBuf message = null;
+        for (int i = 0; i < 100; i++) {
+            message = Unpooled.buffer(req.length);
+            message.writeBytes(req);
+            ctx.writeAndFlush(message);
+
+        }
     }
 
     /**
@@ -82,7 +88,8 @@ class TimeClientHandler extends ChannelInboundHandlerAdapter {
         ByteBuf buf = (ByteBuf) msg;
         byte[] bytes = new byte[buf.readableBytes()];
         buf.readBytes(bytes);
-        System.out.println(new String(bytes, StandardCharsets.UTF_8));
+        String body = new String(req, StandardCharsets.UTF_8);
+        System.out.println("Now is: " + body + " ; the counter is: " + ++counter);
     }
 
     @Override

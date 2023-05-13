@@ -1,4 +1,4 @@
-package cn.tanglaoer;
+package cn.tanglaoer.simple;
 
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.ByteBuf;
